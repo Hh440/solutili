@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import {
     WalletModalProvider,
@@ -9,9 +9,15 @@ import {
 import '@solana/wallet-adapter-react-ui/styles.css';
 import Wallet from './collect/page';
 
-
 const Home = () => {
-    
+    // State to ensure component renders only on the client side
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
+    if (!isClient) return null;  // Prevents SSR mismatch
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white">
@@ -30,9 +36,7 @@ const Home = () => {
                         {/* Main Content */}
                         <div className="container mx-auto mt-12 px-4">
                             <div className="p-8 bg-gray-800 rounded-lg shadow-lg max-w-3xl mx-auto">
-                               
-
-                                <Wallet />
+                                 <Wallet />
                             </div>
                         </div>
                     </WalletModalProvider>

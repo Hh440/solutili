@@ -1,10 +1,10 @@
 'use client'
 
-import { createInitializeMetadataPointerInstruction, createInitializeInstruction, createInitializeMintInstruction, ExtensionType, getMinimumBalanceForRentExemptAccount, getMinimumBalanceForRentExemptMint, getMintLen, LENGTH_SIZE, MINT_SIZE, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, TYPE_SIZE } from '@solana/spl-token'
+import { createInitializeMetadataPointerInstruction, createInitializeInstruction, createInitializeMintInstruction,getAssociatedTokenAddressSync,createMintToInstruction, ExtensionType,  createAssociatedTokenAccountInstruction, getMintLen, LENGTH_SIZE, MINT_SIZE, TOKEN_2022_PROGRAM_ID,TYPE_SIZE } from '@solana/spl-token'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { Connection, Keypair, SystemProgram, Transaction } from '@solana/web3.js'
+import {  Keypair, SystemProgram, Transaction } from '@solana/web3.js'
 import { useState } from 'react'
-import { metadata } from '../layout'
+
 import {pack} from '@solana/spl-token-metadata'
 
 export default function TokenCreationPage() {
@@ -12,7 +12,7 @@ export default function TokenCreationPage() {
   const {connection}= useConnection()
   const [name,setName]= useState('')
   const [symbol,setSymbol]= useState('')
-  const [decimals, setDecimals] = useState(0)
+  const [decimals, setDecimals] = useState('')
   const [supply,setSupply]=useState('')
   const [uri,setUri]= useState('')
   const [description,setDescription]= useState('')
@@ -66,7 +66,7 @@ export default function TokenCreationPage() {
           ),
           createInitializeMintInstruction(
             mintkeyPair.publicKey,
-            decimals,
+            Number(decimals),
             wallet.publicKey,
             null,
             TOKEN_2022_PROGRAM_ID
@@ -86,15 +86,43 @@ export default function TokenCreationPage() {
         
     
         transaction.feePayer = wallet.publicKey;
-        transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-        transaction.sign(mintkeyPair);
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.partialSign(mintkeyPair);
 
         console.log(transaction)
     
-        const signature = await wallet.sendTransaction(transaction, connection, { preflightCommitment: 'processed' });
-        await connection.confirmTransaction(signature, 'processed');
-        console.log('Transaction signature:', signature);
+        
+        await wallet.sendTransaction(transaction, connection);
         alert('complete')
+
+        const associatedToken = getAssociatedTokenAddressSync(
+          mintkeyPair.publicKey,
+          wallet.publicKey,
+          false,
+          TOKEN_2022_PROGRAM_ID,
+      );
+      
+      console.log(associatedToken.toBase58());
+      
+      const transaction2 = new Transaction().add(
+          createAssociatedTokenAccountInstruction(
+              wallet.publicKey,
+              associatedToken,
+              wallet.publicKey,
+              mintkeyPair.publicKey,
+              TOKEN_2022_PROGRAM_ID,
+          ),
+      );
+      
+      await wallet.sendTransaction(transaction2, connection);
+      
+      const transaction3 = new Transaction().add(
+          createMintToInstruction(mintkeyPair.publicKey, associatedToken, wallet.publicKey, Number(supply), [], TOKEN_2022_PROGRAM_ID)
+      );
+      
+      await wallet.sendTransaction(transaction3, connection);
+      console.log("Minted!")
       } catch (error) {
         console.log(error)
         console.error('Error creating token:', error);
