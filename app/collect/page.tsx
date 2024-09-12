@@ -1,7 +1,11 @@
 'use client'
 
+import { createInitializeMetadataPointerInstruction, createInitializeInstruction, createInitializeMintInstruction, ExtensionType, getMinimumBalanceForRentExemptAccount, getMinimumBalanceForRentExemptMint, getMintLen, LENGTH_SIZE, MINT_SIZE, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, TYPE_SIZE } from '@solana/spl-token'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { Connection, Keypair, SystemProgram, Transaction } from '@solana/web3.js'
 import { useState } from 'react'
+import { metadata } from '../layout'
+import {pack} from '@solana/spl-token-metadata'
 
 export default function TokenCreationPage() {
   const [isFrozen, setIsFrozen] = useState(false)
@@ -15,10 +19,90 @@ export default function TokenCreationPage() {
   const [type,setType]= useState('')
   const wallet = useWallet()
 
-
-  const handleSumbit=()=>{
-    console.log(name,symbol,decimals,uri,supply,description,type)
+  
+  if(!wallet.publicKey){
+    return<div>Wallet not connected</div>
   }
+
+    
+   
+    const handleSumbit = async () => {
+
+     
+      
+      try {
+        console.log(name, symbol, decimals, supply, uri, description);
+    
+        const mintkeyPair = Keypair.generate();
+        const metaData = {
+          mint: mintkeyPair.publicKey,
+          name: name,
+          symbol: symbol,
+          uri: uri,
+          additionalMetadata: [],
+        };
+    
+        const mintLen = getMintLen([ExtensionType.MetadataPointer]);
+        const metadataLen = TYPE_SIZE + LENGTH_SIZE + pack(metaData).length;
+        const lamports = await connection.getMinimumBalanceForRentExemption(mintLen + metadataLen);
+
+        if(!wallet.publicKey){
+          return alert('wallet is connected')
+        }
+    
+        const transaction = new Transaction().add(
+          SystemProgram.createAccount({
+            fromPubkey: wallet.publicKey,
+            newAccountPubkey: mintkeyPair.publicKey,
+            space: MINT_SIZE,
+            lamports,
+            programId: TOKEN_2022_PROGRAM_ID,
+          }),
+          createInitializeMetadataPointerInstruction(
+            mintkeyPair.publicKey,
+            wallet.publicKey,
+            mintkeyPair.publicKey,
+            TOKEN_2022_PROGRAM_ID
+          ),
+          createInitializeMintInstruction(
+            mintkeyPair.publicKey,
+            decimals,
+            wallet.publicKey,
+            null,
+            TOKEN_2022_PROGRAM_ID
+          ),
+          createInitializeInstruction({
+            programId: TOKEN_2022_PROGRAM_ID,
+            mint: mintkeyPair.publicKey,
+            metadata: mintkeyPair.publicKey,
+            name: metaData.name,
+            symbol: metaData.symbol,
+            uri: metaData.uri,
+            mintAuthority: wallet.publicKey,
+            updateAuthority: wallet.publicKey,
+          })
+        );
+
+        
+    
+        transaction.feePayer = wallet.publicKey;
+        transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        transaction.sign(mintkeyPair);
+
+        console.log(transaction)
+    
+        const signature = await wallet.sendTransaction(transaction, connection, { preflightCommitment: 'processed' });
+        await connection.confirmTransaction(signature, 'processed');
+        console.log('Transaction signature:', signature);
+        alert('complete')
+      } catch (error) {
+        console.log(error)
+        console.error('Error creating token:', error);
+        alert('An error occurred while creating the token. Please try again.');
+      }
+    };
+    
+  
   
 
   return (
