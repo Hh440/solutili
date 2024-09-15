@@ -1,10 +1,10 @@
 'use client'
 
 import { createInitializeMetadataPointerInstruction, createInitializeInstruction, createInitializeMintInstruction,getAssociatedTokenAddressSync,createMintToInstruction, ExtensionType,  createAssociatedTokenAccountInstruction, getMintLen, LENGTH_SIZE, MINT_SIZE, TOKEN_2022_PROGRAM_ID,TYPE_SIZE } from '@solana/spl-token'
-import { useConnection, useWallet } from '@solana/wallet-adapter-react'
+import { useConnection, useWallet ,} from '@solana/wallet-adapter-react'
 import {  Keypair, SystemProgram, Transaction } from '@solana/web3.js'
 import { useState } from 'react'
-
+import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import {pack} from '@solana/spl-token-metadata'
 
 export default function TokenCreationPage() {
@@ -20,6 +20,7 @@ export default function TokenCreationPage() {
   const wallet = useWallet()
 
   
+
   if(!wallet.publicKey){
     return<div>Wallet not connected</div>
   }
@@ -31,6 +32,11 @@ export default function TokenCreationPage() {
      
       
       try {
+
+
+        if (!wallet.connected || !wallet.publicKey) {
+          return alert("Wallet is not connected");
+         }
         console.log(name, symbol, decimals, supply, uri, description);
     
         const mintkeyPair = Keypair.generate();
@@ -49,12 +55,13 @@ export default function TokenCreationPage() {
         if(!wallet.publicKey){
           return alert('wallet is connected')
         }
+        
     
         const transaction = new Transaction().add(
           SystemProgram.createAccount({
             fromPubkey: wallet.publicKey,
             newAccountPubkey: mintkeyPair.publicKey,
-            space: MINT_SIZE,
+            space: mintLen,
             lamports,
             programId: TOKEN_2022_PROGRAM_ID,
           }),
@@ -83,52 +90,69 @@ export default function TokenCreationPage() {
           })
         );
 
-        
-    
+       
         transaction.feePayer = wallet.publicKey;
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
+        
+        
+        transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        
+        
+
         transaction.partialSign(mintkeyPair);
 
-        console.log(transaction)
-    
         
-        await wallet.sendTransaction(transaction, connection);
-        alert('complete')
+        
+        await wallet.sendTransaction(transaction, connection,{signers: [mintkeyPair]});
+        alert('Associting the token ')
 
-        const associatedToken = getAssociatedTokenAddressSync(
+        const associatedToken= getAssociatedTokenAddressSync(
           mintkeyPair.publicKey,
           wallet.publicKey,
           false,
-          TOKEN_2022_PROGRAM_ID,
-      );
-      
-      console.log(associatedToken.toBase58());
-      
-      const transaction2 = new Transaction().add(
+          TOKEN_2022_PROGRAM_ID
+        )
+
+        console.log(associatedToken.toBase58())
+
+        const transaction2= new Transaction().add(
           createAssociatedTokenAccountInstruction(
-              wallet.publicKey,
-              associatedToken,
-              wallet.publicKey,
-              mintkeyPair.publicKey,
-              TOKEN_2022_PROGRAM_ID,
-          ),
-      );
-      
-      await wallet.sendTransaction(transaction2, connection);
-      
-      const transaction3 = new Transaction().add(
-          createMintToInstruction(mintkeyPair.publicKey, associatedToken, wallet.publicKey, Number(supply), [], TOKEN_2022_PROGRAM_ID)
-      );
-      
-      await wallet.sendTransaction(transaction3, connection);
-      console.log("Minted!")
-      } catch (error) {
-        console.log(error)
-        console.error('Error creating token:', error);
-        alert('An error occurred while creating the token. Please try again.');
-      }
-    };
+            wallet.publicKey,
+            associatedToken,
+            wallet.publicKey,
+            mintkeyPair.publicKey,
+            TOKEN_2022_PROGRAM_ID
+
+          )
+        )
+        await wallet.sendTransaction(transaction2,connection)
+
+        const transaction3= new Transaction().add(
+          createMintToInstruction(
+            mintkeyPair.publicKey,
+            associatedToken,
+            wallet.publicKey,
+            Number(supply),
+            [],
+            TOKEN_2022_PROGRAM_ID
+
+          )
+        )
+
+        await wallet.sendTransaction(transaction3,connection)
+
+        alert('Token Minted Successfully')
+          
+       
+
+      } catch (error:any) {
+        
+        console.error("Error in handleSubmit:", error);
+        console.log(error.message);
+        console.log(error.stack);
+        alert("An unexpected error occurred. Please check the console for details.");
+    }
+
+  }
     
   
   

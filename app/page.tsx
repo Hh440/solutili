@@ -3,21 +3,34 @@ import React, { useEffect, useState } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import {
     WalletModalProvider,
-    WalletDisconnectButton,
-    WalletMultiButton
+    
 } from '@solana/wallet-adapter-react-ui';
 import '@solana/wallet-adapter-react-ui/styles.css';
-import Wallet from './collect/page';
+
+
+import dynamic from 'next/dynamic';
+
+// Dynamically import Wallet component to prevent SSR issues
+const WalletMultiButton = dynamic(
+    () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletMultiButton),
+    { ssr: false }
+);
+const WalletDisconnectButton = dynamic(
+    () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletDisconnectButton),
+    { ssr: false }
+);
+const Wallet = dynamic(() => import('./collect/page'), { ssr: false });
 
 const Home = () => {
     // State to ensure component renders only on the client side
-    const [isClient, setIsClient] = useState(false);
+   /*const [isClient, setIsClient] = useState(false);
 
-    useEffect(() => {
-        setIsClient(true);
+   useEffect(() => {
+       setIsClient(true);
     }, []);
 
     if (!isClient) return null;  // Prevents SSR mismatch
+    */
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-700 text-white">
