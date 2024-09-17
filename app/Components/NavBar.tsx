@@ -83,7 +83,7 @@ const NavBar = () => {
                 <NavigationLink link="/" name={isOpen?"Token" :""}>
                      <Hammer className="stroke-inherit stroke-[0.75] min-w-8 w-8"/>
                 </NavigationLink>
-                <NavigationLink link="" name={isOpen?"Pool":""}>
+                <NavigationLink link="/pool" name={isOpen?"Pool":""}>
                     <Coins className="stroke-inherit stroke-[0.75] min-w-8 w-8"/>
                 </NavigationLink>
 
