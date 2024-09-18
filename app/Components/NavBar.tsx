@@ -77,10 +77,10 @@ const NavBar = () => {
 
             {/* Navigation Links */}
             <div className="flex flex-col gap-3">
-                <NavigationLink link="/" name={isOpen ? "Dashboard" : ""}>
+                <NavigationLink link="/wallet" name={isOpen ? "Dashboard" : ""}>
                     <WalletIcon className="stroke-inherit stroke-[0.75] min-w-8 w-8" />
                 </NavigationLink>
-                <NavigationLink link="/" name={isOpen?"Token" :""}>
+                <NavigationLink link="/collect" name={isOpen?"Token" :""}>
                      <Hammer className="stroke-inherit stroke-[0.75] min-w-8 w-8"/>
                 </NavigationLink>
                 <NavigationLink link="/pool" name={isOpen?"Pool":""}>
