@@ -4,81 +4,66 @@ import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
-import { LAMPORTS_PER_SOL, SystemProgram, Transaction,PublicKey } from '@solana/web3.js'
+import { LAMPORTS_PER_SOL, SystemProgram, Transaction, PublicKey } from '@solana/web3.js'
 
 export default function WalletBalance() {
   const [balance, setBalance] = useState<number>(0)
-  const {connection}=useConnection()
+  const { connection } = useConnection()
   const wallet = useWallet()
-  const [publickey,setPublicKey]= useState('')
-  const [amount,setAmount]= useState(0)
-  
-  
+  const [publickey, setPublicKey] = useState('')
+  const [amount, setAmount] = useState(0)
 
-
-  if(!wallet.publicKey){
-    return(
-        <div> Wallet not connected</div>
+  if (!wallet.publicKey) {
+    return (
+      <div> Wallet not connected</div>
     )
   }
 
   useEffect(() => {
-
     const getBalance = async () => {
+      if (!wallet.publicKey) {
+        setBalance(0)
+        return
+      }
 
-        if(!wallet.publicKey){
-            setBalance(0)
-            return
-        }
-
-        const balance = await connection.getBalance(wallet.publicKey);
-        setBalance(balance /LAMPORTS_PER_SOL);
+      const balance = await connection.getBalance(wallet.publicKey);
+      setBalance(balance / LAMPORTS_PER_SOL);
     };
-    
-    getBalance()
 
-   
-  
-    
-  }, [])
+    getBalance()
+  }, [wallet.publicKey, connection])
 
   const maskPublicKey = (key: string) => {
     return `${key.slice(0, 4)} ${key.slice(4, 8)} ${key.slice(-5, -1)}`
   }
 
-  const handleAirdrop = async() => {
-    
+  const handleAirdrop = async () => {
     const airdropAmount = 1
-    if(wallet.publicKey){
-    await connection.requestAirdrop(wallet.publicKey,airdropAmount* 1000000000)
+    if (wallet.publicKey) {
+      await connection.requestAirdrop(wallet.publicKey, airdropAmount * 1000000000)
     }
     alert("Airdrop Successful")
-      
   }
 
-  const handleTransaction = async()=>{
-
-    try{
-       
-    const transaction = new Transaction().add(
+  const handleTransaction = async () => {
+    try {
+      const transaction = new Transaction().add(
         SystemProgram.transfer({
-            fromPubkey:wallet.publicKey,
-            toPubkey: new PublicKey(publickey),
-            lamports:amount*  LAMPORTS_PER_SOL
-        })        
-    )
+          fromPubkey: wallet.publicKey,
+          toPubkey: new PublicKey(publickey),
+          lamports: amount * LAMPORTS_PER_SOL
+        })
+      )
 
-    await wallet.sendTransaction(transaction,connection)
-    alert("Sent " + amount + " SOL to " + publickey);
-    window.location.reload();
+      await wallet.sendTransaction(transaction, connection)
+      alert("Sent " + amount + " SOL to " + publickey);
+      window.location.reload();
 
-    
-
-    }catch (error) {
-        console.error("Error sending tokens:", error);
-        alert("Failed to send SOL. Please check the address and try again.");
+    } catch (error) {
+      console.error("Error sending tokens:", error);
+      alert("Failed to send SOL. Please check the address and try again.");
     }
-        }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 p-6">
@@ -88,11 +73,11 @@ export default function WalletBalance() {
             <div className="flex justify-between items-start mb-6">
               <div className="space-y-2">
                 <h2 className="text-xl font-bold text-gray-300">Solana Balance</h2>
-                <p className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+                <p className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-blue-600">
                   {balance.toFixed(2)} SOL
                 </p>
               </div>
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-3 w-14 h-14 flex items-center justify-center">
+              <div className="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full p-3 w-14 h-14 flex items-center justify-center">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   viewBox="0 0 24 24"
@@ -106,7 +91,7 @@ export default function WalletBalance() {
               </div>
             </div>
             <div className="mt-4 space-y-2">
-              <div className="w-12 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-md"></div>
+              <div className="w-12 h-8 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md"></div>
               <p className="font-mono text-lg tracking-wider text-gray-300">{maskPublicKey(wallet.publicKey.toString())}</p>
             </div>
             <div className="mt-6 flex justify-between items-end">
@@ -123,14 +108,14 @@ export default function WalletBalance() {
         </Card>
 
         <div className="flex justify-between gap-4">
-          <Button 
-            className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-lg py-3"
+          <Button
+            className="flex-1 bg-gradient-to-r from-green-400 via-teal-500 to-cyan-600 hover:from-green-500 hover:via-teal-600 hover:to-cyan-700 text-white rounded-lg py-3 transition-transform duration-300 transform hover:scale-105"
             onClick={handleAirdrop}
           >
             Airdrop 1 SOL
           </Button>
-          <Button 
-            className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg py-3"
+          <Button
+            className="flex-1 bg-gradient-to-r from-indigo-500 via-blue-600 to-purple-700 hover:from-indigo-600 hover:via-blue-700 hover:to-purple-800 text-white rounded-lg py-3 transition-transform duration-300 transform hover:scale-105"
             onClick={handleTransaction}
           >
             Send Transaction
@@ -143,8 +128,8 @@ export default function WalletBalance() {
             <input 
               id="recipient" 
               placeholder="Enter recipient's public key" 
-              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-purple-500 focus:ring-purple-500" 
-              onChange={(e)=>setPublicKey(e.target.value)}
+              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-indigo-500 focus:ring-indigo-500" 
+              onChange={(e) => setPublicKey(e.target.value)}
             />
           </div>
           <div>
@@ -153,8 +138,8 @@ export default function WalletBalance() {
               id="amount" 
               type="number" 
               placeholder="0.00" 
-              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-purple-500 focus:ring-purple-500" 
-              onChange={(e)=>setAmount(e.target.value)}
+              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-indigo-500 focus:ring-indigo-500" 
+              onChange={(e) => setAmount(e.target.value)}
             />
           </div>
         </form>
