@@ -47,6 +47,12 @@ export default function WalletBalance() {
 
   const handleTransaction = async () => {
     try {
+
+      if (!wallet.publicKey) {
+        alert("Wallet is not connected.");
+        return;
+      }
+  
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: wallet.publicKey,
