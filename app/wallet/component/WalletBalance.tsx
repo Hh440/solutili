@@ -11,7 +11,7 @@ export default function WalletBalance() {
   const { connection } = useConnection()
   const wallet = useWallet()
   const [publickey, setPublicKey] = useState('')
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState('')
 
   if (!wallet.publicKey) {
     return (
@@ -57,7 +57,7 @@ export default function WalletBalance() {
         SystemProgram.transfer({
           fromPubkey: wallet.publicKey,
           toPubkey: new PublicKey(publickey),
-          lamports: amount * LAMPORTS_PER_SOL
+          lamports: Number(amount) * LAMPORTS_PER_SOL
         })
       )
 
