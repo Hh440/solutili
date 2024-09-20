@@ -6,7 +6,8 @@ import { Keypair, SystemProgram, Transaction } from '@solana/web3.js';
 import { useState } from 'react';
 import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import { pack } from '@solana/spl-token-metadata';
-import Script from 'next/script';
+
+import Connection from '@/app/Components/Connection';
 
 export default function TokenCreationPage() {
   const [isFrozen, setIsFrozen] = useState(false);
@@ -21,7 +22,7 @@ export default function TokenCreationPage() {
   const wallet = useWallet();
 
   if (!wallet.publicKey) {
-    return <div>Wallet not connected</div>;
+    return <Connection/>
   }
 
   const handleSumbit = async () => {
