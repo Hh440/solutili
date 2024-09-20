@@ -8,6 +8,7 @@ import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import { pack } from '@solana/spl-token-metadata';
 
 import Connection from '@/app/Components/Connection';
+import { useRouter } from 'next/navigation';
 
 export default function TokenCreationPage() {
   const [isFrozen, setIsFrozen] = useState(false);
@@ -20,6 +21,8 @@ export default function TokenCreationPage() {
   const [description, setDescription] = useState('');
   const [type, setType] = useState('');
   const wallet = useWallet();
+
+  const route= useRouter()
 
   if (!wallet.publicKey) {
     return <Connection/>
@@ -124,12 +127,17 @@ export default function TokenCreationPage() {
       await wallet.sendTransaction(transaction3, connection);
 
       alert('Token Minted Successfully');
+
+      route.push('/tokenSuccess')
     } catch (error: any) {
       console.error("Error in handleSubmit:", error);
       console.log(error.message);
       console.log(error.stack);
       alert("An unexpected error occurred. Please check the console for details.");
     }
+
+
+
   }
 
   return (
