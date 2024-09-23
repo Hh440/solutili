@@ -1,10 +1,32 @@
 'use client'
 import { useEffect, useRef, useState } from 'react';
 import Money from './component/Money';
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { AlertCircle } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { SolanaJSONRPCErrorCode } from '@solana/web3.js';
+import { SolanaLiquidityPool } from '@/components/solana-liquidity-pool-input';
+
 
 const Pool = () => {
     const [isFormVisible, setIsFormVisible] = useState(true);
     const formRef = useRef<HTMLDivElement>(null);
+
+    const [amount1, setAmount1] = useState('')
+    const [amount2, setAmount2] = useState('')
+    const [token1, setToken1] = useState('SOL')
+    const [token2, setToken2] = useState('USDC')
+  
+    const handleAddLiquidity = (e: React.FormEvent) => {
+      e.preventDefault()
+      console.log(`Adding ${amount1} ${token1} and ${amount2} ${token2} to the pool`)
+      setAmount1('')
+      setAmount2('')
+    }
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -35,7 +57,7 @@ const Pool = () => {
         if (!isFormVisible) {
             timer = setTimeout(() => {
                 setIsFormVisible(true);
-            }, 1000); // 100 seconds
+            }, 1000); 
         }
 
         return () => {
@@ -46,55 +68,21 @@ const Pool = () => {
     }, [isFormVisible]);
 
     return (
-        <div className='relative w-full h-screen overflow-hidden'>
-            {/* Money model in the foreground */}
-            <div className='absolute inset-0 w-full h-full z-10'>
-                <Money  /> {/* Adjust scale as needed */}
-            </div>
-            
-            {/* Dark overlay on top of the Money model */}
-            <div className='absolute inset-0 bg-black opacity-50 z-20'></div>
+        <div className="relative w-full h-screen overflow-hidden">
+    {/* Money model in the foreground */}
+    <div className="absolute inset-0 w-full h-full z-10">
+        <Money /> {/* Adjust scale as needed */}
+    </div>
+    
+    {/* Dark overlay on top of the Money model */}
+    <div className="absolute inset-0 bg-black opacity-50 z-20"></div>
 
-            {/* Container for the form */}
-            {isFormVisible && (
-                <div className='absolute inset-0 flex items-center justify-center z-30'>
-                    <div 
-                        ref={formRef} 
-                        className='w-full max-w-lg bg-gray-800 bg-opacity-60 backdrop-blur-lg rounded-lg p-8 shadow-lg border border-gray-700'
-                    >
-                        <h2 className='text-3xl font-bold mb-6 text-gray-200'>Liquidity Pool Input</h2>
-                        <form className='space-y-6'>
-                            <div>
-                                <label htmlFor='amount' className='block text-gray-300 mb-2'>Amount</label>
-                                <input 
-                                    type='number' 
-                                    id='amount' 
-                                    name='amount' 
-                                    className='w-full p-3 border border-gray-600 rounded-lg bg-gray-900 text-gray-200 placeholder-gray-400'
-                                    placeholder='Enter amount'
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor='pool' className='block text-gray-300 mb-2'>Pool Address</label>
-                                <input 
-                                    type='text' 
-                                    id='pool' 
-                                    name='pool' 
-                                    className='w-full p-3 border border-gray-600 rounded-lg bg-gray-900 text-gray-200 placeholder-gray-400'
-                                    placeholder='Enter pool address'
-                                />
-                            </div>
-                            <button 
-                                type='submit' 
-                                className='w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-transform duration-300 ease-in-out transform hover:scale-105'
-                            >
-                                Submit
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
+    {/* Container for the form */}
+    {isFormVisible && (
+        <SolanaLiquidityPool/>
+    )}
+</div>
+
     );
 };
 
