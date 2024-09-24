@@ -1,17 +1,28 @@
 'use client'
 
-import { createInitializeMetadataPointerInstruction, createInitializeInstruction, createInitializeMintInstruction, getAssociatedTokenAddressSync, createMintToInstruction, ExtensionType, createAssociatedTokenAccountInstruction, getMintLen, LENGTH_SIZE, MINT_SIZE, TOKEN_2022_PROGRAM_ID, TYPE_SIZE } from '@solana/spl-token';
+import { 
+  createInitializeMetadataPointerInstruction, 
+  createInitializeInstruction, 
+  createInitializeMintInstruction, 
+  getAssociatedTokenAddressSync, 
+  createMintToInstruction, 
+  ExtensionType, 
+  createAssociatedTokenAccountInstruction, 
+  getMintLen, 
+  LENGTH_SIZE, 
+  MINT_SIZE, 
+  TOKEN_2022_PROGRAM_ID, 
+  TYPE_SIZE 
+} from '@solana/spl-token';
+
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { Keypair, SystemProgram, Transaction } from '@solana/web3.js';
 import { useState } from 'react';
-import { WalletSendTransactionError } from '@solana/wallet-adapter-base';
 import { pack } from '@solana/spl-token-metadata';
-
-import Connection from '@/app/Components/Connection';
 import { useRouter } from 'next/navigation';
 
 export default function TokenCreationPage() {
-  const [isFrozen, setIsFrozen] = useState(false);
+  
   const { connection } = useConnection();
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
@@ -21,18 +32,22 @@ export default function TokenCreationPage() {
   const [description, setDescription] = useState('');
   const [type, setType] = useState('');
   const wallet = useWallet();
-
-  const route= useRouter()
+  const [success,setSuccess] = useState(false)
+  const route = useRouter();
 
   if (!wallet.publicKey) {
-    return <Connection/>
+    return <div>Not connected</div>;
   }
 
-  const handleSumbit = async () => {
+  const handleSumbit = async (e: any) => {
+    e.preventDefault();
+    
     try {
       if (!wallet.connected || !wallet.publicKey) {
         return alert("Wallet is not connected");
       }
+
+      console.log(wallet.publicKey)
       console.log(name, symbol, decimals, supply, uri, description);
 
       const mintkeyPair = Keypair.generate();
@@ -90,7 +105,7 @@ export default function TokenCreationPage() {
 
       transaction.partialSign(mintkeyPair);
 
-      console.log(`Token mint is created for the ${mintkeyPair.publicKey.toBase58()}`)
+      console.log(`Token mint is created for the ${mintkeyPair.publicKey.toBase58()}`);
 
       await wallet.sendTransaction(transaction, connection, { signers: [mintkeyPair] });
       alert('Associating the token');
@@ -129,7 +144,11 @@ export default function TokenCreationPage() {
       await wallet.sendTransaction(transaction3, connection);
 
       alert('Token Minted Successfully');
+      setSuccess(true)
 
+      if(success){
+        route.push('/tokenSuccess')
+      }
       
     } catch (error: any) {
       console.error("Error in handleSubmit:", error);
@@ -137,9 +156,6 @@ export default function TokenCreationPage() {
       console.log(error.stack);
       alert("An unexpected error occurred. Please check the console for details.");
     }
-
-
-
   }
 
   return (
@@ -155,7 +171,7 @@ export default function TokenCreationPage() {
 
         <div className="w-full max-w-2xl bg-gray-800 bg-opacity-70 rounded-lg shadow-2xl p-8 relative">
           <h1 className="text-3xl font-bold mb-6 text-center">Create Your Token</h1>
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSumbit}>
             <div className="flex items-center justify-between space-x-4">
               <label htmlFor="name" className="text-sm text-gray-400 w-1/4">Token Name</label>
               <input
@@ -233,28 +249,12 @@ export default function TokenCreationPage() {
               />
             </div>
 
-            <div className="flex items-center justify-center space-x-4 mt-6">
-              <button
-                type="button"
-                onClick={() => setIsFrozen(!isFrozen)}
-                className={`px-6 py-3 rounded-lg font-semibold shadow-lg transition-all duration-300 transform hover:scale-105 
-                ${isFrozen ? 'bg-blue-500' : 'bg-gray-600'}
-              `}
-              >
-                {isFrozen ? 'Token Frozen' : 'Freeze Token'}
-              </button>
-            </div>
-
-            <div className="flex justify-end space-x-4 mt-6">
-              <button className="px-4 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 transition-all duration-200">Cancel</button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 transition-all duration-200"
-                onClick={handleSumbit}
-              >
-                Create Token
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-lg font-semibold"
+            >
+              Create Token
+            </button>
           </form>
         </div>
       </div>

@@ -3,7 +3,12 @@
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
-import TokenCreationPage from './component/CreateToken';
+
+import dynamic from 'next/dynamic';
+
+const TokenCreationPage = dynamic(() => import('./component/CreateToken'), { ssr: false });
+
+
 
 const Collect = () => {
   const wallets = [new PhantomWalletAdapter()];
