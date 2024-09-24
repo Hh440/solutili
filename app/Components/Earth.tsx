@@ -1,9 +1,10 @@
 import { Canvas, useThree } from "@react-three/fiber";
-import { MeshTransmissionMaterial, OrbitControls, Text3D, Float, Environment } from "@react-three/drei";
+import { MeshTransmissionMaterial, OrbitControls, Text3D, Float, Environment, Stars, Sparkles } from "@react-three/drei";
 import { Suspense, useRef } from "react";
 import Model from './Model';
 import * as THREE from 'three'
 import { Physics } from "@react-three/cannon";
+
 
 
 
@@ -33,6 +34,17 @@ const Earth = () => {
         {/* Environment and Orbit Controls */}
         <Environment preset="city" />
         <OrbitControls dampingFactor={1} />
+        <Stars
+          radius={300}
+          depth={100}
+          count={400000}
+          factor={4}
+          saturation={0}
+          fade
+          speed={0.2}
+        />
+        
+        
       </Canvas>
     </div>
   );

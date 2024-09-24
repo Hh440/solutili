@@ -1,4 +1,4 @@
-import { useAnimations, useGLTF, Text } from "@react-three/drei";
+import { useAnimations, useGLTF, Text, Text3D } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";

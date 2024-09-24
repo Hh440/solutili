@@ -90,6 +90,8 @@ export default function TokenCreationPage() {
 
       transaction.partialSign(mintkeyPair);
 
+      console.log(`Token mint is created for the ${mintkeyPair.publicKey.toBase58()}`)
+
       await wallet.sendTransaction(transaction, connection, { signers: [mintkeyPair] });
       alert('Associating the token');
 
@@ -128,7 +130,7 @@ export default function TokenCreationPage() {
 
       alert('Token Minted Successfully');
 
-      route.push('/tokenSuccess')
+      
     } catch (error: any) {
       console.error("Error in handleSubmit:", error);
       console.log(error.message);

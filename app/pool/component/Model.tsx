@@ -1,5 +1,5 @@
 'use client'
-import { useAnimations, useGLTF } from "@react-three/drei";
+import { Environment, MeshReflectorMaterial, useAnimations, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useEffect, useRef, useState } from "react";
 import * as THREE from 'three';
@@ -46,6 +46,26 @@ const Model = () => {
     return (
         <group ref={group} position={[-1,-4,0]} scale={[4, 4, 4]}>
             <primitive object={scene} />
+            <mesh position-y={-0.00} rotation-x={-Math.PI/2}>
+                <planeGeometry args={[100,100]}/>
+                <MeshReflectorMaterial
+                blur={[100, 100]}
+                resolution={2048}
+                mixBlur={1}
+                mixStrength={10}
+                roughness={1}
+                depthScale={1}
+                opacity={0.5}
+                transparent
+                minDepthThreshold={0.4}
+                maxDepthThreshold={1.4}
+                color="#333"
+                metalness={0.5}
+                mirror={1}
+                
+                />
+                <Environment preset="park"/>
+            </mesh>
         </group>
     );
 };
