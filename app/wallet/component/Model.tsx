@@ -1,5 +1,4 @@
-import { Canvas } from "@react-three/fiber"
-import { Physics, useSphere, usePlane } from "@react-three/cannon"
+import {  useSphere, usePlane } from "@react-three/cannon"
 import { Mesh } from "three"
 import { MeshReflectorMaterial, useTexture ,Texture, Environment} from "@react-three/drei"
 interface SphereProps {

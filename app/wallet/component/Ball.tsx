@@ -21,7 +21,8 @@ const generateSpheres = (count: number) => {
 };
 
 const Ball = () => {
-    const spheres = generateSpheres(400); 
+    const num = Math.random() * 500;
+    const spheres = generateSpheres(num); 
 
     return (
         <>
@@ -29,7 +30,7 @@ const Ball = () => {
                 <color attach="background" args={['#2D2D2D']}  />
                 <OrbitControls />
                 <ambientLight />
-                <directionalLight position={[10, 10, 10]} castShadow shadow-mapSize={[2048, 2048]}/>
+                <directionalLight position={[10, 10, 10]} castShadow shadow-mapSize={[2048, 2048]} />
                 
                 <Suspense>
                     <Physics>
