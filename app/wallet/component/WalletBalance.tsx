@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, SystemProgram, Transaction, PublicKey } from '@solana/web3.js'
-import Connection from '@/app/Components/Connection';
+import Ball from './Ball'
+import Connection from '@/app/Components/Connection'
 
 export default function WalletBalance() {
   const [balance, setBalance] = useState<number>(0)
@@ -15,9 +16,7 @@ export default function WalletBalance() {
   const [amount, setAmount] = useState('')
 
   if (!wallet.publicKey) {
-    return (
-      <Connection/>
-    )
+    return <Connection />
   }
 
   useEffect(() => {
@@ -27,9 +26,9 @@ export default function WalletBalance() {
         return
       }
 
-      const balance = await connection.getBalance(wallet.publicKey);
-      setBalance(balance / LAMPORTS_PER_SOL);
-    };
+      const balance = await connection.getBalance(wallet.publicKey)
+      setBalance(balance / LAMPORTS_PER_SOL)
+    }
 
     getBalance()
   }, [wallet.publicKey, connection])
@@ -43,38 +42,42 @@ export default function WalletBalance() {
     if (wallet.publicKey) {
       await connection.requestAirdrop(wallet.publicKey, airdropAmount * 1000000000)
     }
-    alert("Airdrop Successful")
+    alert('Airdrop Successful')
   }
 
   const handleTransaction = async () => {
     try {
-
       if (!wallet.publicKey) {
-        alert("Wallet is not connected.");
-        return;
+        alert('Wallet is not connected.')
+        return
       }
-  
+
       const transaction = new Transaction().add(
         SystemProgram.transfer({
           fromPubkey: wallet.publicKey,
           toPubkey: new PublicKey(publickey),
-          lamports: Number(amount) * LAMPORTS_PER_SOL
+          lamports: Number(amount) * LAMPORTS_PER_SOL,
         })
       )
 
       await wallet.sendTransaction(transaction, connection)
-      alert("Sent " + amount + " SOL to " + publickey);
-      window.location.reload();
-
+      alert('Sent ' + amount + ' SOL to ' + publickey)
+      window.location.reload()
     } catch (error) {
-      console.error("Error sending tokens:", error);
-      alert("Failed to send SOL. Please check the address and try again.");
+      console.error('Error sending tokens:', error)
+      alert('Failed to send SOL. Please check the address and try again.')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-black to-gray-900 p-6">
-      <div className="w-full max-w-lg space-y-10">
+    <div className="relative min-h-screen flex items-center justify-center p-6">
+      {/* 3D Canvas with Ball Model */}
+      <div className='absolute inset-0 w-full h-full z-0'>
+                <Ball /> 
+      </div>
+
+      {/* Wallet Balance Card */}
+      <div className="relative z-10 w-full max-w-lg space-y-10">
         <Card className="bg-gradient-to-r from-gray-800 to-gray-900 text-white overflow-hidden rounded-2xl shadow-xl border border-gray-700">
           <CardContent className="p-8">
             <div className="flex justify-between items-start mb-6">
@@ -99,7 +102,9 @@ export default function WalletBalance() {
             </div>
             <div className="mt-4 space-y-2">
               <div className="w-12 h-8 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-md"></div>
-              <p className="font-mono text-lg tracking-wider text-gray-300">{maskPublicKey(wallet.publicKey.toString())}</p>
+              <p className="font-mono text-lg tracking-wider text-gray-300">
+                {maskPublicKey(wallet.publicKey.toString())}
+              </p>
             </div>
             <div className="mt-6 flex justify-between items-end">
               <div>
@@ -131,21 +136,25 @@ export default function WalletBalance() {
 
         <form className="space-y-6 mt-6" onSubmit={(e) => e.preventDefault()}>
           <div>
-            <label htmlFor="recipient" className="text-gray-300">Recipient Address</label>
-            <input 
-              id="recipient" 
-              placeholder="Enter recipient's public key" 
-              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-indigo-500 focus:ring-indigo-500" 
+            <label htmlFor="recipient" className="text-gray-300">
+              Recipient Address
+            </label>
+            <input
+              id="recipient"
+              placeholder="Enter recipient's public key"
+              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-indigo-500 focus:ring-indigo-500"
               onChange={(e) => setPublicKey(e.target.value)}
             />
           </div>
           <div>
-            <label htmlFor="amount" className="text-gray-300">Amount (SOL)</label>
-            <input 
-              id="amount" 
-              type="number" 
-              placeholder="0.00" 
-              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-indigo-500 focus:ring-indigo-500" 
+            <label htmlFor="amount" className="text-gray-300">
+              Amount (SOL)
+            </label>
+            <input
+              id="amount"
+              type="number"
+              placeholder="0.00"
+              className="w-full bg-gray-800 text-white border-gray-700 rounded-md p-3 mt-1 focus:border-indigo-500 focus:ring-indigo-500"
               onChange={(e) => setAmount(e.target.value)}
             />
           </div>
