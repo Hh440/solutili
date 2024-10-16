@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import { LAMPORTS_PER_SOL, SystemProgram, Transaction, PublicKey } from '@solana/web3.js'
 import Ball from './Ball'
-import Connection from '@/app/Components/Connection'
+import Locked from '@/app/Components/Connection'
 
 export default function WalletBalance() {
   const [balance, setBalance] = useState<number>(0)
@@ -16,7 +16,7 @@ export default function WalletBalance() {
   const [amount, setAmount] = useState('')
 
   if (!wallet.publicKey) {
-    return <Connection />
+    return <Locked />
   }
 
   useEffect(() => {

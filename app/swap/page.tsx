@@ -7,7 +7,7 @@ import Swaping from './component/Swaping';
 const Pool= ()=>{
     return(
 
-        <ConnectionProvider endpoint={'https://solana-devnet.g.alchemy.com/v2/bN7nlZQIEly-Vv752sdL8zXX4-9Ygd-W'}>
+        <ConnectionProvider endpoint={'https://solana-mainnet.g.alchemy.com/v2/bN7nlZQIEly-Vv752sdL8zXX4-9Ygd-W'}>
         <WalletProvider wallets={[]} autoConnect>
           <WalletModalProvider>
             <Swaping/>

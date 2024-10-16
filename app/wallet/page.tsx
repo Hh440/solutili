@@ -14,7 +14,7 @@ const WalletBalance = dynamic(() => import('./component/WalletBalance'), { ssr: 
 const Wallet = ()=>{
     const wallets = [new PhantomWalletAdapter()];
     return (
-        <ConnectionProvider endpoint={'https://solana-devnet.g.alchemy.com/v2/bN7nlZQIEly-Vv752sdL8zXX4-9Ygd-W'}>
+        <ConnectionProvider endpoint={'https://solana-mainnet.g.alchemy.com/v2/bN7nlZQIEly-Vv752sdL8zXX4-9Ygd-W'}>
         <WalletProvider wallets={wallets} autoConnect>
           <WalletModalProvider>
             <WalletBalance/>

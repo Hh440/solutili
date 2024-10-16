@@ -5,7 +5,7 @@ const Earth = dynamic(() => import('./Earth'), {
     ssr: false,
 
 })
-const Connection = ()=>{
+const Locked= ()=>{
     return(
         <div className='w-full h-full bg-[#1f2221]'>
             <Earth/>
@@ -13,4 +13,4 @@ const Connection = ()=>{
     )
 }
 
-export default Connection
+export default Locked
