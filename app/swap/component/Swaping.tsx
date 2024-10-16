@@ -58,9 +58,11 @@
     const quoteResponse = response.data;
     
     if (token2 === 'usdc') {
-        setAmount2(parseFloat(quoteResponse.outAmount / 1e6).toFixed(6));
+        setAmount2((quoteResponse.outAmount / 1e6).toFixed(6).toString()); 
+
     } else if (token2 === 'sol') {
-        setAmount2(parseFloat(quoteResponse.outAmount / lamports).toFixed(9));
+        setAmount2((quoteResponse.outAmount / lamports).toFixed(7).toString()); 
+
     }
     console.log(quoteResponse.outAmount);
 
