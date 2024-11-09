@@ -4,41 +4,36 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Wallet, Coins, Droplet, Zap, ChevronRight } from 'lucide-react'
-import { ConnectionProvider, useWallet, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react'
+import { WalletModalProvider } from '@solana/wallet-adapter-react-ui'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets' // Add wallet adapters here
 
 interface FeatureCardProps {
-  title: string,
-  description: string,
-  icon: any,
+  title: string
+  description: string
+  icon: React.ReactNode
 }
 
 const WalletMultiButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletMultiButton),
   { ssr: false }
-);
+)
 const WalletDisconnectButton = dynamic(
   () => import('@solana/wallet-adapter-react-ui').then((mod) => mod.WalletDisconnectButton),
   { ssr: false }
-);
+)
 
 export function HomePageComponent() {
-  const [isConnected, setIsConnected] = useState(false)
   const router = useRouter()
-  const wallet = useWallet()
-
-  const handleConnect = () => {
-    setIsConnected(!isConnected)
-  }
 
   const handleToken = () => {
     router.push(`/collect`)
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100">
       <header className="bg-gradient-to-r from-gray-800 via-gray-900 to-gray-800 py-6 px-8 flex justify-between items-center shadow-lg">
         <h1 className="text-3xl font-bold flex items-center space-x-2">
           <Coins className="text-yellow-500 animate-spin-slow" />
@@ -47,7 +42,7 @@ export function HomePageComponent() {
           </span>
         </h1>
         <ConnectionProvider endpoint={'https://solana-devnet.g.alchemy.com/v2/bN7nlZQIEly-Vv752sdL8zXX4-9Ygd-W'}>
-          <WalletProvider wallets={[]} autoConnect>
+          <WalletProvider wallets={[new PhantomWalletAdapter()]} autoConnect>
             <WalletModalProvider>
               <div className="flex items-center space-x-4 bg-gradient-to-r from-gray-700 via-gray-800 to-gray-700 px-6 py-3 rounded-lg shadow-xl">
                 <WalletMultiButton className="wallet-button bg-indigo-600 hover:bg-indigo-700 transition-all duration-300" />
@@ -58,7 +53,7 @@ export function HomePageComponent() {
         </ConnectionProvider>
       </header>
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 py-12 flex-grow">
         <section className="mb-12 text-center">
           <h2 className="text-5xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
             Welcome to Our DeFi Platform
@@ -98,13 +93,13 @@ export function HomePageComponent() {
         </section>
       </main>
 
-      <footer className="bg-gradient-to-r from-gray-800 via-black to-gray-800 py-8 px-4 mt-44">
+      <footer className="bg-gradient-to-r from-gray-800 via-black to-gray-800 py-6 mt-auto">
         <div className="container mx-auto text-center text-gray-400">
           <p>&copy; 2023 DeFi Platform. All rights reserved.</p>
-          <div className="mt-4 space-x-6">
-            <a href="#" className="hover:text-gray-100 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-gray-100 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-100 transition-colors">Contact Us</a>
+          <div className="mt-2 space-x-4">
+            <a href="#" className="hover:text-gray-200">Terms</a>
+            <a href="#" className="hover:text-gray-200">Privacy</a>
+            <a href="#" className="hover:text-gray-200">Contact</a>
           </div>
         </div>
       </footer>

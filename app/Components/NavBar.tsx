@@ -55,7 +55,7 @@ const NavBar = () => {
             variants={containerVariants}
             animate={containerControls}
             initial="close"
-            className="bg-gray-900 flex flex-col z-10 gap-20 p-5 absolute top-0 left-0 h-full shadow shadow-neutral-600"
+            className="bg-gray-900 flex flex-col z-10 gap-20 p-5 absolute top-0 left-0 h-screen shadow shadow-neutral-600"
         >
             <div className="flex flex-row w-full justify-between items-center">
                 {/* Conditional Gradient Circle */}
